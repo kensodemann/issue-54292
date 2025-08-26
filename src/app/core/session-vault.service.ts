@@ -34,7 +34,7 @@ export class SessionVaultService {
         key: 'io.ionic.gettingstartediv',
         type: VaultType.SecureStorage,
         deviceSecurityType: DeviceSecurityType.None,
-        lockAfterBackgrounded: 2000,
+        // lockAfterBackgrounded: 2000,
       });
     } catch {
       await this.vault.clear();
