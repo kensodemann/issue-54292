@@ -1,32 +1,27 @@
-import { Component, OnDestroy, inject } from '@angular/core';
-import { IonApp, IonRouterOutlet, NavController } from '@ionic/angular/standalone';
-import { Subscription } from 'rxjs';
+import { Component, inject } from '@angular/core';
+import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { SessionVaultService } from './core/session-vault.service';
+import { App } from '@capacitor/app';
+import { LoggerService } from './core/logger.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
   imports: [IonApp, IonRouterOutlet],
 })
-export class AppComponent implements OnDestroy {
-  private subscription: Subscription;
-
+export class AppComponent {
   constructor() {
-    const navController = inject(NavController);
+    const logger = inject(LoggerService);
     const sessionVault = inject(SessionVaultService);
 
-    this.subscription = sessionVault.locked$.subscribe(async (lock) => {
-      if (lock) {
-        try {
-          await sessionVault.unlock();
-        } catch {
-          navController.navigateRoot(['unlock']);
-        }
+    App.addListener('appStateChange', async ({ isActive }) => {
+      try {
+        logger.log(`app state change isActive: ${isActive}`);
+        await sessionVault.unlock();
+        await sessionVault.getSession();
+      } catch (err: any) {
+        logger.log(JSON.stringify(err));
       }
     });
-  }
-
-  ngOnDestroy() {
-    this.subscription.unsubscribe();
   }
 }

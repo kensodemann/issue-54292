@@ -11,5 +11,11 @@
     </ion-toolbar>
   </ion-header>
 
-  <app-explore-container name="Tab 2 page"></app-explore-container>
+  <ul>
+    @for (log of logger.logs; track $index) {
+    <li>{{ log }}</li>
+    } @empty {
+    <li>There are no logs.</li>
+    }
+  </ul>
 </ion-content>

@@ -6,21 +6,29 @@ import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
 import { SessionVaultService } from './app/core/session-vault.service';
 import { environment } from './environments/environment';
+import { LoggerService } from './app/core/logger.service';
 
 if (environment.production) {
   enableProdMode();
 }
 
 const appInitFactory =
-  (vault: SessionVaultService): (() => Promise<void>) =>
+  (logger: LoggerService, vault: SessionVaultService): (() => Promise<void>) =>
   async () => {
-    await vault.initialize();
+    try {
+      logger.log('init');
+      await vault.initialize();
+      const session = await vault.getSession();
+      logger.log(`init session: ${JSON.stringify(session)}`);
+    } catch (err: any) {
+      logger.log(JSON.stringify(err));
+    }
   };
 
 bootstrapApplication(AppComponent, {
   providers: [
     provideAppInitializer(() => {
-      const initializerFn = appInitFactory(inject(SessionVaultService));
+      const initializerFn = appInitFactory(inject(LoggerService), inject(SessionVaultService));
       return initializerFn();
     }),
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
