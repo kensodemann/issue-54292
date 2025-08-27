@@ -1,8 +1,8 @@
 import { Component, inject } from '@angular/core';
-import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
-import { SessionVaultService } from './core/session-vault.service';
 import { App } from '@capacitor/app';
+import { IonApp, IonRouterOutlet } from '@ionic/angular/standalone';
 import { LoggerService } from './core/logger.service';
+import { SessionVaultService } from './core/session-vault.service';
 
 @Component({
   selector: 'app-root',
@@ -15,6 +15,11 @@ export class AppComponent {
   private timeout: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
+    this.setupPauseListener();
+    this.setupResumeListener();
+  }
+
+  private setupPauseListener() {
     App.addListener('pause', async () => {
       this.timeout = setTimeout(() => {
         this.sessionVault.lock();
@@ -30,7 +35,9 @@ export class AppComponent {
         }
       }, 4000);
     });
+  }
 
+  private setupResumeListener() {
     App.addListener('resume', async () => {
       if (this.timeout) {
         clearTimeout(this.timeout);

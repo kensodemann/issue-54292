@@ -3,6 +3,8 @@ import {
   BrowserVault,
   DeviceSecurityType,
   IdentityVaultConfig,
+  IVLogger,
+  LogLevel,
   Vault,
   VaultType,
 } from '@ionic-enterprise/identity-vault';
@@ -30,11 +32,11 @@ export class SessionVaultService {
 
   async initialize(): Promise<void> {
     try {
+      IVLogger.setLoggingLevel(LogLevel.Debug);
       await this.vault.initialize({
         key: 'io.ionic.gettingstartediv',
         type: VaultType.SecureStorage,
         deviceSecurityType: DeviceSecurityType.None,
-        // lockAfterBackgrounded: 2000,
       });
     } catch {
       await this.vault.clear();
